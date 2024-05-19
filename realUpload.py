@@ -3,39 +3,45 @@ import random
 import requests
 import time
 from datetime import datetime
+from requests.exceptions import RequestException
 
 def download_file(url, destination, max_speed=102400, timeout=180):
-
-    response = requests.get(url, stream=True)
-    total_size = int(response.headers.get('content-length', 0))
-    downloaded_size = 0
-    start_time = time.time()  # Start time of the download
     try:
-        with open(destination, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=1024):
-                if chunk:
-                    f.write(chunk)
-                    downloaded_size += len(chunk)
-                    elapsed_time = time.time() - start_time
-                    download_speed = downloaded_size / elapsed_time  # Instant download speed
-                    download_speed_MB = download_speed / (1024 * 1024)  # Convert to megabytes per second
-                    progress = (downloaded_size / total_size) * 100
-                    print(f"Downloading... {progress:.2f}% completed, Download Speed: {download_speed_MB:.2f} MB/s", end='\r')
-                    # Control download speed
-                    if download_speed > max_speed:
-                        remaining_time = (downloaded_size / max_speed) - elapsed_time
-                        if remaining_time > 0:
-                            time.sleep(remaining_time)
-                    # Check timeout
-                    if elapsed_time > timeout:
-                        raise TimeoutError("Download timed out")
-    except KeyboardInterrupt:
-        print("\nDownload interrupted by user!")
+        response = requests.get(url, stream=True)
+        total_size = int(response.headers.get('content-length', 0))
+        downloaded_size = 0
+        start_time = time.time()  # Start time of the download
+        try:
+            with open(destination, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=1024):
+                    if chunk:
+                        f.write(chunk)
+                        downloaded_size += len(chunk)
+                        elapsed_time = time.time() - start_time
+                        download_speed = downloaded_size / elapsed_time  # Instant download speed
+                        download_speed_MB = download_speed / (1024 * 1024)  # Convert to megabytes per second
+                        progress = (downloaded_size / total_size) * 100
+                        print(f"Downloading... {progress:.2f}% completed, Download Speed: {download_speed_MB:.2f} MB/s", end='\r')
+                        # Control download speed
+                        if download_speed > max_speed:
+                            remaining_time = (downloaded_size / max_speed) - elapsed_time
+                            if remaining_time > 0:
+                                time.sleep(remaining_time)
+                        # Check timeout
+                        if elapsed_time > timeout:
+                            raise TimeoutError("Download timed out")
+        except KeyboardInterrupt:
+            print("\nDownload interrupted by user!")
+        except TimeoutError:
+            print("\nDownload timed out!")
+            os.remove(destination)  # Remove the partially downloaded file if the download times out
+        else:
+            print("\nDownload completed!")
+    except RequestException as e:
+        print(f"Failed to download file from {url}: {e}")
     except TimeoutError:
         print("\nDownload timed out!")
         os.remove(destination)  # Remove the partially downloaded file if the download times out
-    else:
-        print("\nDownload completed!")
 
 
 
