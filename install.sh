@@ -30,65 +30,65 @@ if ! command_exists virtualenv ; then
 fi
 
 # Clone the GitHub repository
-REPO_URL="https://github.com/mtashani/real-upload.gits"
-CLONE_DIR="/opt/Real-Update"
+# REPO_URL="https://github.com/mtashani/real-upload.gits"
+# CLONE_DIR="/opt/Real-Update"
 
-if [ ! -d "$CLONE_DIR" ] ; then
-    echo "Cloning the repository..."
-    git clone "$REPO_URL" "$CLONE_DIR"
-fi
+# if [ ! -d "$CLONE_DIR" ] ; then
+#     echo "Cloning the repository..."
+#     git clone "$REPO_URL" "$CLONE_DIR"
+# fi
 
-cd "$CLONE_DIR"
+# cd "$CLONE_DIR"
 
-# Create a virtual environment
-if [ ! -d "env" ] ; then
-    echo "Creating virtual environment..."
-    virtualenv env
-fi
+# # Create a virtual environment
+# if [ ! -d "env" ] ; then
+#     echo "Creating virtual environment..."
+#     virtualenv env
+# fi
 
-# Activate the virtual environment
-echo "Activating virtual environment..."
-source env/bin/activate
+# # Activate the virtual environment
+# echo "Activating virtual environment..."
+# source env/bin/activate
 
-# Install requirements
-echo "Installing requirements..."
-pip install -r requirements.txt
+# # Install requirements
+# echo "Installing requirements..."
+# pip install -r requirements.txt
 
-# Deactivate the virtual environment
-echo "Deactivating virtual environment..."
-deactivate
+# # Deactivate the virtual environment
+# echo "Deactivating virtual environment..."
+# deactivate
 
-# Create systemd service file
-SERVICE_FILE="/etc/systemd/system/realUpload.service"
+# # Create systemd service file
+# SERVICE_FILE="/etc/systemd/system/realUpload.service"
 
-echo "Creating systemd service file..."
+# echo "Creating systemd service file..."
 
-sudo bash -c "cat > $SERVICE_FILE" <<EOL
-[Unit]
-Description=Run Python script at startup
-After=network.target
+# sudo bash -c "cat > $SERVICE_FILE" <<EOL
+# [Unit]
+# Description=Run Python script at startup
+# After=network.target
 
-[Service]
-User=$USER
-WorkingDirectory=$(pwd)
-ExecStart=$(pwd)/env/bin/python $(pwd)/realUpload.py
-Restart=always
+# [Service]
+# User=$USER
+# WorkingDirectory=$(pwd)
+# ExecStart=$(pwd)/env/bin/python $(pwd)/realUpload.py
+# Restart=always
 
-[Install]
-WantedBy=multi-user.target
-EOL
+# [Install]
+# WantedBy=multi-user.target
+# EOL
 
-# Reload systemd manager configuration
-echo "Reloading systemd manager configuration..."
-sudo systemctl daemon-reload
+# # Reload systemd manager configuration
+# echo "Reloading systemd manager configuration..."
+# sudo systemctl daemon-reload
 
-# Enable the service to start on boot
-echo "Enabling the service to start on boot..."
-sudo systemctl enable realUpload.service
+# # Enable the service to start on boot
+# echo "Enabling the service to start on boot..."
+# sudo systemctl enable realUpload.service
 
-# Start the service immediately
-echo "Starting the service..."
-sudo systemctl start realUpload.service
+# # Start the service immediately
+# echo "Starting the service..."
+# sudo systemctl start realUpload.service
 
-# Check the status of the service
-sudo systemctl status realUpload.service
+# # Check the status of the service
+# sudo systemctl status realUpload.service
