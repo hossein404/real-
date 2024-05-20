@@ -59,9 +59,9 @@ def main():
         file_name = random_url.split("/")[-1]
         
         if current_time >= datetime.strptime("01:00:00", "%H:%M:%S").time() and current_time <= datetime.strptime("07:30:00", "%H:%M:%S").time():
-            max_speed = 24000 * 1024  
+            max_speed = 120000 * 1024  
         else:
-            max_speed = 12000 * 1024  
+            max_speed = 60000 * 1024  
 
         print(f"Downloading file from: {random_url}")
         random_timeout = random.randint(180, 300)
