@@ -5,6 +5,17 @@ import time
 from datetime import datetime
 from requests.exceptions import RequestException
 
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
+
+file_handler = logging.FileHandler('real-upload.log')
+formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+
 def download_file(url, destination, max_speed=102400, timeout=180):
     try:
         response = requests.get(url, stream=True)
@@ -31,49 +42,47 @@ def download_file(url, destination, max_speed=102400, timeout=180):
                         # Check timeout
                         if elapsed_time > timeout:
                             raise TimeoutError("Download timed out")
-        except KeyboardInterrupt:
-            print("\nDownload interrupted by user!")
         except TimeoutError:
-            print("\nDownload timed out!")
+            logger.exception(f"Download timed out!")
             os.remove(destination)  # Remove the partially downloaded file if the download times out
-        else:
+        finally:
             print("\nDownload completed!")
     except RequestException as e:
-        print(f"Failed to download file from {url}: {e}")
-    except TimeoutError:
-        print("\nDownload timed out!")
-        os.remove(destination)  # Remove the partially downloaded file if the download times out
+        logger.exception(f"Failed to download file from {url}: {e}") # Remove the partially downloaded file if the download times out
 
 
 
 def main():
     while True:
-        current_time = datetime.now().time()
-        start_time = datetime.strptime("23:00:00", "%H:%M:%S").time()
-        end_time = datetime.strptime("08:00:00", "%H:%M:%S").time()
-        
-        # if current_time >= start_time or current_time <= end_time:
-        file_path = "urls.txt"
-        with open(file_path, "r") as file:
-            urls = file.readlines()
-        random_url = random.choice(urls).strip()  # Randomly select one URL from the list
-        file_name = random_url.split("/")[-1]
-        
-        if current_time >= datetime.strptime("01:00:00", "%H:%M:%S").time() and current_time <= datetime.strptime("07:30:00", "%H:%M:%S").time():
-            max_speed = 120000 * 1024  
-        else:
-            max_speed = 60000 * 1024  
-
-        print(f"Downloading file from: {random_url}")
-        random_timeout = random.randint(180, 300)
-        download_file(random_url, file_name, max_speed=max_speed, timeout=random_timeout)  # Max speed in bytes per second, timeout in seconds
         try:
-            os.remove(file_name)  # Remove the downloaded file
-            print(f"File {file_name} removed!\n")
-        except FileNotFoundError:
-            print(f"File {file_name} not found!\n")
-        random_sleep = random.randint(10, 120)
-        time.sleep(random_sleep)
+            current_time = datetime.now().time()
+            start_time = datetime.strptime("23:00:00", "%H:%M:%S").time()
+            end_time = datetime.strptime("08:00:00", "%H:%M:%S").time()
+            
+            # if current_time >= start_time or current_time <= end_time:
+            file_path = "urls.txt"
+            with open(file_path, "r") as file:
+                urls = file.readlines()
+            random_url = random.choice(urls).strip()  # Randomly select one URL from the list
+            file_name = random_url.split("/")[-1]
+            
+            if current_time >= datetime.strptime("01:00:00", "%H:%M:%S").time() and current_time <= datetime.strptime("07:30:00", "%H:%M:%S").time():
+                max_speed = 120000 * 1024  
+            else:
+                max_speed = 60000 * 1024  
+
+            print(f"Downloading file from: {random_url}")
+            random_timeout = random.randint(180, 300)
+            download_file(random_url, file_name, max_speed=max_speed, timeout=random_timeout)  # Max speed in bytes per second, timeout in seconds
+            try:
+                os.remove(file_name)  # Remove the downloaded file
+                print(f"File {file_name} removed!\n")
+            except FileNotFoundError:
+                print(f"File {file_name} not found!\n")
+            random_sleep = random.randint(10, 120)
+            time.sleep(random_sleep)
+        except Exception as e:
+            logger.exception(f" {e}")
 
 if __name__ == "__main__":
     main()
