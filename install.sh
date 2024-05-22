@@ -30,7 +30,7 @@ if ! command_exists virtualenv ; then
 fi
 
 # Clone the GitHub repository
-REPO_URL="https://github.com/mtashani/real-upload.git"
+REPO_URL="https://github.com/hossein404/real-upload.git"
 CLONE_DIR="/opt/Real-Update"
 
 if [ ! -d "$CLONE_DIR" ] ; then
