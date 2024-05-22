@@ -11,6 +11,7 @@ def download_file(url, destination, max_speed=102400, timeout=180):
         total_size = int(response.headers.get('content-length', 0))
         downloaded_size = 0
         start_time = time.time()  # Start time of the download
+        time.sleep(1)
         try:
             with open(destination, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=1024):
